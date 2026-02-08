@@ -1,46 +1,52 @@
-{% set name = "termdbms" %}
-{% set version = "0.9" %}
+schema_version: 1
+
+context:
+  name: termdbms
+  version: 0.9
 
 package:
-  name: {{ name|lower }}
-  version: {{ version }}
+  name: ${{ name|lower }}
+  version: ${{ version }}
 
 source:
-  - url: https://github.com/mathaou/{{ name }}/archive/v{{ version }}-alpha.tar.gz
+  - url: https://github.com/mathaou/${{ name }}/archive/v${{ version }}-alpha.tar.gz
     sha256: 7ad5cfb55bcbf7dafb679ae1dfc63ac85de005de6f0a62f494a24f0782008240
-    folder: src
+    target_directory: src
   - url: https://github.com/cznic/mathutil/raw/master/LICENSE
     sha256: bfa9bf72a72ca009fd62a8f84fca3dca67e51d93af96352723646599898b6cf5
 
 build:
-  number: 0
+  number: 1
   script:
     - mv LICENSE LICENSE-modernc-mathutil
     - cd src
-    - go build -v -o $PREFIX/bin/termdbms  # [not win]
-    - go build -v -o %LIBRARY_PREFIX%\bin\termdbms.exe  # [win]
+    - if: not win
+      then: go build -v -o $PREFIX/bin/termdbms
+    - if: win
+      then: go build -v -o %LIBRARY_PREFIX%\bin\termdbms.exe
     - go-licenses save . --save_path=../license-files --ignore modernc.org/mathutil
 
 requirements:
   build:
-    - {{ compiler('go-nocgo') }}
+    - ${{ compiler('go-nocgo') }}
     - go-licenses
 
-test:
-  commands:
-    # termdbms -h exits with code 1
-    - which termdbms  # [not win]
-    - where termdbms  # [win]
+tests:
+  - script:
+      - if: not win
+        then: which termdbms
+      - if: win
+        then: where termdbms
 
 about:
-  home: https://github.com/mathaou/termdbms
   license: MIT
   license_file:
     - src/LICENSE
     - LICENSE-modernc-mathutil
     - license-files/
   summary: TUI for viewing and editing database files
-  dev_url: https://github.com/mathaou/termdbms
+  homepage: https://github.com/mathaou/termdbms
+  repository: https://github.com/mathaou/termdbms
 
 extra:
   recipe-maintainers:
