@@ -1,29 +1,27 @@
 schema_version: 1
 
 context:
-  name: termdbms
-  version: 0.9
+  version: "0.9"
 
 package:
-  name: ${{ name|lower }}
+  name: termdbms
   version: ${{ version }}
 
 source:
-  - url: https://github.com/mathaou/${{ name }}/archive/v${{ version }}-alpha.tar.gz
+  - url: https://github.com/mathaou/termdbms/archive/v${{ version }}-alpha.tar.gz
     sha256: 7ad5cfb55bcbf7dafb679ae1dfc63ac85de005de6f0a62f494a24f0782008240
     target_directory: src
   - url: https://github.com/cznic/mathutil/raw/master/LICENSE
     sha256: bfa9bf72a72ca009fd62a8f84fca3dca67e51d93af96352723646599898b6cf5
 
 build:
-  number: 1
+  number: 2
   script:
     - mv LICENSE LICENSE-modernc-mathutil
     - cd src
     - if: not win
       then: go build -v -o $PREFIX/bin/termdbms
-    - if: win
-      then: go build -v -o %LIBRARY_PREFIX%\bin\termdbms.exe
+      else: go build -v -o %LIBRARY_PREFIX%\bin\termdbms.exe
     - go-licenses save . --save_path=../license-files --ignore modernc.org/mathutil
 
 requirements:
@@ -35,9 +33,7 @@ tests:
   - script:
       - if: not win
         then: which termdbms
-      - if: win
-        then: where termdbms
-
+        else: where termdbms
 about:
   license: MIT
   license_file:
